@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ETTC 課程表">
+<meta name="theme-color" content="#ff6b6b">
+<title>ETTC 2026 課程表</title>
+<style>
+:root{
+  --bg:#fff8f0;--card:#fff;--ink:#2b2d42;--sub:#6c6f85;--line:#ffe3cc;
+  --brand:#ff6b6b;--brand2:#ff922b;--brand3:#ffd43b;
+  --chip:#fff0e0;--chipon:#ff6b6b;--chipoff:#fff;--live:#e8590c;--star:#f59f00;
+  --lec:#339af0;--skill:#20c997;--drill:#f06595;--exam:#7950f2;--break:#fab005;--reg:#ff922b;--other:#adb5bd;
+  --gA:#ff6b6b;--gB:#339af0;--gC:#51cf66;--gD:#be4bdb;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 -apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;padding-bottom:env(safe-area-inset-bottom)}
+header{background:linear-gradient(135deg,#ff6b6b 0%,#ff922b 55%,#ffd43b 100%);color:#fff;padding:calc(16px + env(safe-area-inset-top)) 16px 18px;position:relative;overflow:hidden}
+header::after{content:"";position:absolute;right:-40px;top:-40px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.18)}
+header::before{content:"";position:absolute;right:60px;bottom:-60px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.14)}
+header h1{margin:0;font-size:22px;line-height:1.3;text-shadow:0 1px 2px rgba(0,0,0,.15)}
+header p{margin:6px 0 0;font-size:13px;opacity:.95;position:relative}
+header a{color:#fff;font-weight:600}
+.bar{position:sticky;top:0;z-index:20;background:var(--bg);padding:8px 12px 8px;border-bottom:2px solid var(--line);box-shadow:0 2px 10px rgba(255,146,43,.08)}
+.days{display:flex;gap:8px;margin-bottom:8px}
+.days button{flex:1;padding:7px 6px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--ink);font-size:15px;font-weight:700;cursor:pointer}
+.days button.on{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;border-color:transparent;box-shadow:0 4px 12px rgba(255,107,107,.35)}
+.days small{display:block;font-weight:500;font-size:12px;opacity:.85}
+.search{display:flex;gap:8px}
+.search input,.search select{font-size:16px;padding:9px 10px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--ink);min-width:0}
+.search input{flex:1}
+.search input:focus,.search select:focus{outline:none;border-color:var(--brand2)}
+.filters{padding:10px 12px 0}
+.row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.row .lbl{font-size:13px;font-weight:700;color:var(--sub);flex:none}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;flex:1}
+.chips::-webkit-scrollbar{display:none}
+.chips.wrap{flex-wrap:wrap;overflow:visible;row-gap:6px}
+.row.stack{flex-wrap:wrap}
+.row.stack .lbl{width:100%;margin-bottom:2px}
+.row.stack .chips{flex-basis:100%}
+.row.stack .chips.wrap .chip{padding:5px 8px}
+.chips.wrap .chip{padding:5px 10px;font-size:13px}
+.chip{flex:none;padding:6px 12px;border-radius:999px;border:2px solid transparent;background:var(--chip);color:var(--ink);font-size:14px;font-weight:600;cursor:pointer}
+.chip.on{background:var(--chipon);color:#fff}
+.chip.gA.on{background:var(--gA)}.chip.gB.on{background:var(--gB)}.chip.gC.on{background:var(--gC)}.chip.gD.on{background:var(--gD)}
+.chip.t-lec.on{background:var(--lec)}.chip.t-skill.on{background:var(--skill)}.chip.t-drill.on{background:var(--drill)}.chip.t-exam.on{background:var(--exam)}.chip.t-break.on{background:var(--break);color:#4a3b00}.chip.t-reg.on{background:var(--reg)}.chip.mine.on{background:var(--star)}.chip.t-fac.on{background:#15aabf}
+.tools{display:flex;gap:8px;align-items:center;margin-top:4px;font-size:13px;color:var(--sub)}
+.tools .grow{flex:1}
+.tools button{border:2px solid var(--line);background:var(--card);color:var(--ink);padding:6px 10px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer}
+.banner{margin:10px 12px 0;padding:10px 12px;border-radius:12px;background:#fff3bf;border:2px solid #ffe066;font-size:14px}
+.banner b{color:var(--live)}
+.hint{margin:10px 12px 0;padding:10px 12px;border-radius:12px;background:#e3fafc;border:2px solid #99e9f2;font-size:13px;color:#0b7285}
+main{padding:4px 12px 40px}
+section.info:last-of-type{margin-bottom:40px}
+.slot{margin:18px 0 8px;font-size:15px;font-weight:800;color:var(--brand2);display:flex;align-items:center;gap:8px}
+.slot::after{content:"";flex:1;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--brand3),transparent)}
+.card{background:var(--card);border:2px solid var(--line);border-left:6px solid var(--other);border-radius:14px;padding:10px 12px;margin:0 0 8px;box-shadow:0 2px 8px rgba(255,146,43,.06)}
+.card.t-lec{border-left-color:var(--lec)}.card.t-skill{border-left-color:var(--skill)}.card.t-drill{border-left-color:var(--drill)}
+.card.t-exam{border-left-color:var(--exam)}.card.t-break{border-left-color:var(--break)}.card.t-reg{border-left-color:var(--reg)}
+.card.past{background:#f1f3f5;border-color:#dee2e6;border-left-color:#adb5bd!important;box-shadow:none;color:#868e96}
+.card.past .time,.card.past h3,.card.past .tag,.card.past .teacher,.card.past .teacher b,.card.past .note{color:#868e96}
+.card.past .room,.card.past .grp{background:#dee2e6;color:#868e96}
+.card.past .star{color:#ced4da}.card.past .star.on{color:#e9c46a}
+.slot.past{color:#adb5bd}.slot.past::after{background:#e9ecef}
+.card.live{border:3px solid #e03131;border-left-width:8px;box-shadow:0 0 0 4px rgba(224,49,49,.2),0 8px 20px rgba(224,49,49,.25);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 4px rgba(224,49,49,.2),0 8px 20px rgba(224,49,49,.25)}50%{box-shadow:0 0 0 8px rgba(224,49,49,.08),0 8px 20px rgba(224,49,49,.25)}}
+.livetag{background:#e03131}
+.top{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--sub);flex-wrap:wrap}
+.time{font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink)}
+.room{background:var(--chip);border-radius:8px;padding:1px 8px;color:#a1470a;font-weight:600}
+.grp{border-radius:8px;padding:1px 8px;color:#fff;font-weight:700}
+.grp.gA{background:var(--gA)}.grp.gB{background:var(--gB)}.grp.gC{background:var(--gC)}.grp.gD{background:var(--gD)}
+.livetag{background:var(--live);color:#fff;border-radius:8px;padding:1px 8px;font-weight:700}
+.star{margin-left:auto;border:0;background:none;font-size:22px;line-height:1;color:#ccc;padding:2px 4px;cursor:pointer}
+.star.on{color:var(--star)}
+.card h3{margin:4px 0 2px;font-size:16px;line-height:1.4}
+.tag{font-size:12px;font-weight:700}
+.t-lec .tag{color:var(--lec)}.t-skill .tag{color:var(--skill)}.t-drill .tag{color:var(--drill)}.t-exam .tag{color:var(--exam)}.t-break .tag{color:#b08900}.t-reg .tag{color:var(--reg)}
+.teacher{font-size:14px;color:var(--ink);margin-top:3px}
+.teacher b{color:var(--brand)}
+.note{font-size:12px;color:var(--sub);margin-top:2px}
+.empty{text-align:center;color:var(--sub);padding:40px 10px}
+section.info{margin:10px 12px 0;background:var(--card);border:2px solid var(--line);border-radius:16px;padding:12px 14px;font-size:14px}
+section.info h2{font-size:16px;margin:0 0 8px;color:var(--brand);display:flex;align-items:center;gap:6px}
+section.info ul{margin:4px 0;padding-left:18px}
+section.info li{margin:4px 0}
+.maps{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
+.maps a{display:flex;align-items:center;justify-content:center;gap:6px;padding:11px 10px;border-radius:12px;color:#fff;text-decoration:none;font-weight:700;font-size:14px;box-shadow:0 4px 10px rgba(0,0,0,.1)}
+.maps a.g{background:linear-gradient(135deg,#4285f4,#34a853)}
+.maps a.a{background:linear-gradient(135deg,#2b2d42,#5c5f7a)}
+.route{border-top:2px dashed var(--line);padding:10px 0 2px;margin-top:8px}
+.route .rt{font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.route .rt .ico{font-size:18px}
+.route .rd{color:var(--sub);font-size:13px;margin-bottom:6px}
+.route .links{display:flex;gap:6px;flex-wrap:wrap}
+.route .links a{font-size:13px;padding:5px 10px;border-radius:999px;text-decoration:none;font-weight:600;border:2px solid}
+.route .links a.g{color:#1a73e8;border-color:#a8c7fa;background:#eef4ff}
+.route .links a.a{color:#2b2d42;border-color:#c8c9d6;background:#f1f2f6}
+.route .links .na{font-size:13px;padding:5px 10px;border-radius:999px;font-weight:600;border:2px solid #ffc9c9;background:#fff5f5;color:#e03131}
+.fac{display:grid;grid-template-columns:1fr;gap:8px}
+.fac .f{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:14px;background:var(--card);border:2px solid var(--line);box-shadow:0 2px 8px rgba(255,146,43,.06)}
+.fac .av{flex:none;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:15px}
+.fac .nm{font-weight:700}
+.fac .ti{font-size:13px;color:var(--sub)}
+@media(min-width:720px){main,.bar,.filters,section.info,.banner,.hint{max-width:760px;margin-left:auto;margin-right:auto}.fac{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<header>
+  <h1>ETTC 急診外傷訓練課程</h1>
+  <p>日期：2026/10/13（二）至10/14（三）｜地點：中山醫學大學附設醫院誠愛樓10樓</p>
+  <p>課程籌劃人：葉兆斌 醫師／教授｜主辦：中山醫學大學附設醫院急診醫學部</p>
+</header>
+
+<div class="bar">
+  <div class="days" id="days"></div>
+  <div class="search">
+    <input id="q" type="search" placeholder="搜尋課程、講師、關鍵字" autocomplete="off" enterkeyhint="search">
+    <select id="room" aria-label="上課地點"></select>
+  </div>
+</div>
+<div class="filters">
+  <div class="row"><span class="lbl">我的組別</span><div class="chips" id="groups"></div></div>
+  <div class="row"><span class="lbl">類型</span><div class="chips" id="chips"></div></div>
+  <div class="tools">
+    <span class="grow" id="count"></span>
+    <button id="goNow">跳到現在</button>
+  </div>
+</div>
+<div id="hint" class="hint" hidden></div>
+<div id="banner" class="banner" hidden></div>
+<main id="list"></main>
+
+<section class="info">
+  <h2>🗺️ 交通指引</h2>
+  <div><b>中山醫學大學附設醫院（大慶院區）</b><br>台中市南區建國北路一段 110 號｜課程地點：誠愛樓 10 樓</div>
+  <div class="maps">
+    <a class="g" href="https://www.google.com/maps/dir/?api=1&destination=%E4%B8%AD%E5%B1%B1%E9%86%AB%E5%AD%B8%E5%A4%A7%E5%AD%B8%E9%99%84%E8%A8%AD%E9%86%AB%E9%99%A2%E8%AA%A0%E6%84%9B%E6%A8%93&travelmode=transit" target="_blank" rel="noopener">📍 Google Maps 導航</a>
+    <a class="a" href="https://maps.apple.com/?daddr=%E5%8F%B0%E4%B8%AD%E5%B8%82%E5%8D%97%E5%8D%80%E5%BB%BA%E5%9C%8B%E5%8C%97%E8%B7%AF%E4%B8%80%E6%AE%B5110%E8%99%9F&q=%E4%B8%AD%E5%B1%B1%E9%86%AB%E5%AD%B8%E5%A4%A7%E5%AD%B8%E9%99%84%E8%A8%AD%E9%86%AB%E9%99%A2%E8%AA%A0%E6%84%9B%E6%A8%93" target="_blank" rel="noopener">🍎 Apple 地圖導航</a>
+  </div>
+  <div class="route">
+    <div class="rt"><span class="ico">🚆</span>台鐵</div>
+    <div class="rd">於台鐵「大慶站」下車，步行約 5 分鐘。</div>
+    <div class="links">
+      <a class="g" href="https://www.google.com/maps/dir/?api=1&origin=%E5%8F%B0%E9%90%B5%E5%A4%A7%E6%85%B6%E8%BB%8A%E7%AB%99&destination=%E4%B8%AD%E5%B1%B1%E9%86%AB%E5%AD%B8%E5%A4%A7%E5%AD%B8%E9%99%84%E8%A8%AD%E9%86%AB%E9%99%A2%E8%AA%A0%E6%84%9B%E6%A8%93&travelmode=walking" target="_blank" rel="noopener">Google 步行路線</a>
+      <a class="a" href="https://maps.apple.com/?saddr=%E5%A4%A7%E6%85%B6%E8%BB%8A%E7%AB%99&daddr=%E5%8F%B0%E4%B8%AD%E5%B8%82%E5%8D%97%E5%8D%80%E5%BB%BA%E5%9C%8B%E5%8C%97%E8%B7%AF%E4%B8%80%E6%AE%B5110%E8%99%9F&q=%E4%B8%AD%E5%B1%B1%E9%86%AB%E5%AD%B8%E5%A4%A7%E5%AD%B8%E9%99%84%E8%A8%AD%E9%86%AB%E9%99%A2%E8%AA%A0%E6%84%9B%E6%A8%93&dirflg=w" target="_blank" rel="noopener">Apple 步行路線</a>
+    </div>
+  </div>
+  <div class="route">
+    <div class="rt"><span class="ico">🚄</span>高鐵</div>
+    <div class="rd">於高鐵「台中站」下車：<br>① 轉搭高鐵免費接駁車，於「中山附醫站」下車；<br>② 或轉乘台中捷運至「大慶站」，再步行約 5 分鐘。</div>
+    <div class="links">
+      <a class="g" href="https://www.google.com/maps/dir/?api=1&origin=%E9%AB%98%E9%90%B5%E5%8F%B0%E4%B8%AD%E7%AB%99&destination=%E4%B8%AD%E5%B1%B1%E9%86%AB%E5%AD%B8%E5%A4%A7%E5%AD%B8%E9%99%84%E8%A8%AD%E9%86%AB%E9%99%A2%E8%AA%A0%E6%84%9B%E6%A8%93&travelmode=transit" target="_blank" rel="noopener">Google 大眾運輸</a>
+      <span class="na">Apple 地圖不支援大眾運輸</span>
+    </div>
+  </div>
+  <div class="route">
+    <div class="rt"><span class="ico">🚌</span>市公車</div>
+    <div class="rd">統聯客運 73 號或 85 號公車，於「中山附醫站」下車。</div>
+    <div class="links">
+      <a class="g" href="https://www.google.com/maps/dir/?api=1&destination=%E4%B8%AD%E5%B1%B1%E9%86%AB%E5%AD%B8%E5%A4%A7%E5%AD%B8%E9%99%84%E8%A8%AD%E9%86%AB%E9%99%A2%E8%AA%A0%E6%84%9B%E6%A8%93&travelmode=transit" target="_blank" rel="noopener">Google 公車路線</a>
+      <span class="na">Apple 地圖不支援大眾運輸</span>
+    </div>
+  </div>
+  <div class="route">
+    <div class="rt"><span class="ico">🚗</span>自行開車</div>
+    <div class="rd">導航目的地設定「中山醫學大學附設醫院」。大慶院區及誠愛樓為收費停車場，恕無法提供優惠。</div>
+    <div class="links">
+      <a class="g" href="https://www.google.com/maps/dir/?api=1&destination=%E4%B8%AD%E5%B1%B1%E9%86%AB%E5%AD%B8%E5%A4%A7%E5%AD%B8%E9%99%84%E8%A8%AD%E9%86%AB%E9%99%A2%E8%AA%A0%E6%84%9B%E6%A8%93&travelmode=driving" target="_blank" rel="noopener">Google 開車導航</a>
+      <a class="a" href="https://maps.apple.com/?daddr=%E5%8F%B0%E4%B8%AD%E5%B8%82%E5%8D%97%E5%8D%80%E5%BB%BA%E5%9C%8B%E5%8C%97%E8%B7%AF%E4%B8%80%E6%AE%B5110%E8%99%9F&q=%E4%B8%AD%E5%B1%B1%E9%86%AB%E5%AD%B8%E5%A4%A7%E5%AD%B8%E9%99%84%E8%A8%AD%E9%86%AB%E9%99%A2%E8%AA%A0%E6%84%9B%E6%A8%93&dirflg=d" target="_blank" rel="noopener">Apple 開車導航</a>
+    </div>
+  </div>
+</section>
+
+<script>
+"use strict";
+/* ---------- 資料 ---------- */
+var TYPES=[["all","全部"],["lec","講課"],["skill","技術站"],["drill","綜合演練"],["exam","測驗"],["break","報到／休息"],["mine","★ 我的行程"],["fac","講師介紹"]];
+var TYPENAME={lec:"講課",skill:"技術站",drill:"綜合演練",exam:"測驗評估",break:"休息",reg:"報到／用餐"};
+var DATES={1:"2026-10-13",2:"2026-10-14"};
+var MAIN="多功能教室7";
+var DATA=[];
+/* d,start,end,room,type,title,teacher,group,note */
+function S(d,s,e,r,t,n,te,g,note){DATA.push({d:d,s:s,e:e,r:r,t:t,n:n,te:te||"",g:g||"",note:note||""});}
+
+/* ===== 第一天 10/13（二） ===== */
+S(1,"08:00","08:10",MAIN,"reg","報到");
+S(1,"08:10","09:00",MAIN,"lec","外傷之初級及次級評估及處置","葉兆斌 醫師","","含外傷轉診原則");
+S(1,"09:00","09:50",MAIN,"lec","外傷休克及呼吸道處置","王柏元 醫師");
+S(1,"09:50","10:40",MAIN,"lec","特殊情況外傷概論","席國陽 醫師","","燒灼傷、凍傷、兒童、孕婦、老人");
+S(1,"10:40","10:50",MAIN,"break","休息");
+S(1,"10:50","11:40",MAIN,"lec","頭頸部外傷及脊椎外傷概論、骨骼肌肉外傷概論","席國陽 醫師");
+S(1,"11:40","12:30",MAIN,"lec","胸腹部創傷概論","何世偉 醫師");
+S(1,"12:30","13:30",MAIN,"reg","午餐");
+S(1,"15:10","15:20",MAIN,"break","休息");
+
+/* 第一天下午技術站：教室3~6 */
+var ST1=[
+  {r:"多功能教室3",t:"skill",n:"外傷休克及氣道處置",te:"王柏元 醫師"},
+  {r:"多功能教室4",t:"drill",n:"外傷綜合演練（I）",te:"席國陽 醫師"},
+  {r:"多功能教室5",t:"skill",n:"外傷基本及重要急救技術",te:"何世偉 醫師"},
+  {r:"多功能教室6",t:"skill",n:"脊椎外傷（含搬運技術）",te:"賴宜欣 醫師"}
+];
+/* 每個時段：教室3,4,5,6 依序對應的組別 */
+var ROT1=[["13:30","14:20",["A","B","C","D"]],["14:20","15:10",["D","A","B","C"]],["15:20","16:10",["C","D","A","B"]],["16:10","17:00",["B","C","D","A"]]];
+ROT1.forEach(function(sl){sl[2].forEach(function(g,i){var st=ST1[i];S(1,sl[0],sl[1],st.r,st.t,st.n,st.te,g);});});
+
+/* ===== 第二天 10/14（三） ===== */
+S(2,"08:00","08:10",MAIN,"reg","報到");
+S(2,"08:10","09:00",MAIN,"lec","災難應變與外傷體系","紀煥庭 醫師");
+S(2,"10:40","10:50",MAIN,"break","休息");
+S(2,"12:30","13:30",MAIN,"reg","午餐");
+S(2,"13:30","14:30",MAIN,"exam","筆試－學科評估（全體學員）","葉兆斌醫師、紀煥庭醫師、黃昭硯醫師、何世偉醫師");
+S(2,"14:30","17:50",MAIN,"exam","術科包括情境測驗（全體學員）","葉兆斌醫師、紀煥庭醫師、黃昭硯醫師、何世偉醫師");
+
+var ST2=[
+  {r:"多功能教室3",t:"skill",n:"特殊災害介紹",te:"紀煥庭 醫師"},
+  {r:"多功能教室4",t:"drill",n:"外傷綜合演練（II）",te:"黃昭硯 醫師"},
+  {r:"多功能教室5",t:"skill",n:"肢體外傷處置與固定（骨骼肌肉外傷）",te:"葉兆斌 醫師"},
+  {r:"多功能教室6",t:"drill",n:"外傷綜合演練（III）",te:"何世偉 醫師"}
+];
+var ROT2=[["09:00","09:50",["A","B","C","D"]],["09:50","10:40",["D","A","B","C"]],["10:50","11:40",["C","D","A","B"]],["11:40","12:30",["B","C","D","A"]]];
+ROT2.forEach(function(sl){sl[2].forEach(function(g,i){var st=ST2[i];S(2,sl[0],sl[1],st.r,st.t,st.n,st.te,g);});});
+
+var FACULTY=[
+  ["葉兆斌 醫師","中山醫學大學醫學系教授／中山醫學大學醫學系急診醫學科科主任（課程籌劃人）"],
+  ["何世偉 醫師","中山醫學大學醫學系助理教授／中山醫學大學附設醫院急診部主任"],
+  ["黃昭硯 醫師","中山醫學大學醫學系助理教授／中山醫學大學附設醫院臨床能力中心主任"],
+  ["王柏元 醫師","中山醫學大學醫學系急診醫學科助理教授／中山醫學大學附設醫院急診部教研主任"],
+  ["紀煥庭 醫師","台北醫學大學傷害防治研究所碩士／台中榮民總醫院急診醫學部主治醫師"],
+  ["賴宜欣 醫師","中山醫學大學醫學研究所碩士／中山醫學大學急診醫學部主治醫師"],
+  ["席國陽 醫師","彰化秀傳紀念醫院急診醫學部醫師"]
+];
+var AVCOL=["#ff6b6b","#339af0","#20c997","#f06595","#7950f2","#fab005","#ff922b"];
+
+/* ---------- 邏輯 ---------- */
+var ROOMORDER=["多功能教室3","多功能教室4","多功能教室5","多功能教室6",MAIN];
+function rank(r){var i=ROOMORDER.indexOf(r);return i<0?99:i;}
+function mm(t){var p=t.split(":");return (+p[0])*60+(+p[1]);}
+DATA.forEach(function(x){x.id=x.d+"|"+x.s+"|"+x.r+"|"+x.g;x.sm=mm(x.s);x.em=mm(x.e);});
+DATA.sort(function(a,b){return a.d-b.d||a.sm-b.sm||rank(a.r)-rank(b.r);});
+
+var ST={day:1,type:"all",q:"",room:"all",group:"all"};
+var MINE={};
+try{MINE=JSON.parse(localStorage.getItem("ettc2026_mine")||"{}")||{};}catch(e){MINE={};}
+try{ST.group=localStorage.getItem("ettc2026_group")||"all";}catch(e){}
+function saveMine(){try{localStorage.setItem("ettc2026_mine",JSON.stringify(MINE));}catch(e){}}
+function saveGroup(){try{localStorage.setItem("ettc2026_group",ST.group);}catch(e){}}
+
+/* 測試用：網址加 ?now=2026-10-13T09:20 可模擬指定時間 */
+var FAKE=null;
+try{var m=/[?&]now=(\d{4}-\d{2}-\d{2})T(\d{2}):(\d{2})/.exec(location.search);if(m)FAKE={date:m[1],min:(+m[2])*60+(+m[3])};}catch(e){}
+function taipeiNow(){
+  if(FAKE)return {date:FAKE.date,min:FAKE.min};
+  var o={};
+  new Intl.DateTimeFormat("en-GB",{timeZone:"Asia/Taipei",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false})
+    .formatToParts(new Date()).forEach(function(p){o[p.type]=p.value;});
+  return {date:o.year+"-"+o.month+"-"+o.day,min:((+o.hour)%24)*60+(+o.minute)};
+}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+
+function matches(x){
+  if(x.d!==ST.day)return false;
+  if(ST.type==="mine"){if(!MINE[x.id])return false;}
+  else if(ST.type==="break"){if(x.t!=="break"&&x.t!=="reg")return false;}
+  else if(ST.type!=="all"&&x.t!==ST.type)return false;
+  if(ST.room!=="all"&&x.r!==ST.room)return false;
+  if(ST.group!=="all"&&x.g&&x.g!==ST.group)return false;
+  if(ST.q){
+    var hay=(x.n+" "+x.te+" "+x.r+" "+x.note+" "+(x.g?x.g+"組":"")+" "+TYPENAME[x.t]).toLowerCase();
+    var terms=ST.q.toLowerCase().split(/\s+/).filter(Boolean);
+    for(var k=0;k<terms.length;k++){if(hay.indexOf(terms[k])<0)return false;}
+  }
+  return true;
+}
+
+function render(){
+  var hintEl=document.getElementById("hint");
+  if(ST.type==="fac"){
+    document.getElementById("list").innerHTML='<div class="slot">講師介紹</div><div class="fac">'+FACULTY.map(function(f,i){
+      return '<div class="f"><div class="av" style="background:'+AVCOL[i%AVCOL.length]+'">'+esc(f[0].charAt(0))+'</div><div><div class="nm">'+esc(f[0])+'</div><div class="ti">'+esc(f[1])+'</div></div></div>';
+    }).join("")+'</div>';
+    document.getElementById("count").textContent="共 "+FACULTY.length+" 位講師";
+    hintEl.hidden=true;
+    return;
+  }
+  var now=taipeiNow(),live=(now.date===DATES[ST.day]),dayOver=(now.date>DATES[ST.day]);
+  var list=DATA.filter(matches),html="",lastS="";
+  list.forEach(function(x){
+    var isLive=live&&now.min>=x.sm&&now.min<x.em;
+    var isPast=dayOver||(live&&now.min>=x.em);
+    if(x.s!==lastS){
+      var slotPast=dayOver||(live&&now.min>=x.sm&&!list.some(function(y){return y.s===x.s&&now.min<y.em;}));
+      html+='<div class="slot'+(slotPast?" past":"")+'">'+x.s+'</div>';lastS=x.s;
+    }
+    var star=!!MINE[x.id];
+    html+='<article class="card t-'+x.t+(isLive?" live":"")+(isPast?" past":"")+'" data-id="'+esc(x.id)+'">'
+      +'<div class="top"><span class="time">'+x.s+'–'+x.e+'</span><span class="room">'+esc(x.r)+'</span>'
+      +(x.g?'<span class="grp g'+x.g+'">'+x.g+' 組</span>':'')
+      +(isLive?'<span class="livetag">進行中</span>':'')
+      +'<button class="star'+(star?" on":"")+'" aria-label="加入我的行程" data-star="'+esc(x.id)+'">'+(star?"★":"☆")+'</button></div>'
+      +'<h3>'+esc(x.n)+'</h3>'+((x.t==="reg"||x.t==="break")?'':'<div class="tag">'+TYPENAME[x.t]+'</div>')
+      +(x.te?'<div class="teacher">講師：<b>'+esc(x.te)+'</b></div>':'')
+      +(x.note?'<div class="note">'+esc(x.note)+'</div>':'')
+      +'</article>';
+  });
+  document.getElementById("list").innerHTML=html||'<div class="empty">沒有符合條件的課程</div>';
+  document.getElementById("count").textContent="共 "+list.length+" 場";
+  var h=document.getElementById("hint");
+  if(ST.group!=="all"){h.textContent="目前顯示 "+ST.group+" 組的分站順序；講課、測驗與休息為全體共同時段。";h.hidden=false;}
+  else{h.textContent="請點選「我的組別」查看你的分站教室與順序。";h.hidden=false;}
+}
+
+function buildDays(){
+  var el=document.getElementById("days");
+  el.innerHTML='<button data-day="1">第一天 10/13（二）<small>講課＋技術站</small></button><button data-day="2">第二天 10/14（三）<small>技術站＋測驗</small></button>';
+  el.querySelectorAll("button").forEach(function(b){
+    b.addEventListener("click",function(){ST.day=+b.dataset.day;ST.room="all";syncUI();render();window.scrollTo(0,0);});
+  });
+}
+function buildGroups(){
+  var el=document.getElementById("groups");
+  el.innerHTML='<button class="chip" data-g="all">全部</button>'+["A","B","C","D"].map(function(g){return '<button class="chip g'+g+'" data-g="'+g+'">'+g+' 組</button>';}).join("");
+  el.querySelectorAll(".chip").forEach(function(b){
+    b.addEventListener("click",function(){ST.group=b.dataset.g;saveGroup();syncUI();render();});
+  });
+}
+function buildChips(){
+  var el=document.getElementById("chips");
+  el.innerHTML=TYPES.map(function(t){return '<button class="chip t-'+t[0]+(t[0]==="mine"?" mine":"")+'" data-t="'+t[0]+'">'+t[1]+'</button>';}).join("");
+  el.querySelectorAll(".chip").forEach(function(b){
+    b.addEventListener("click",function(){ST.type=b.dataset.t;syncUI();render();});
+  });
+}
+function buildRooms(){
+  var rooms={};
+  DATA.filter(function(x){return x.d===ST.day;}).forEach(function(x){rooms[x.r]=1;});
+  var keys=Object.keys(rooms).sort(function(a,b){return rank(a)-rank(b);});
+  var sel=document.getElementById("room");
+  sel.innerHTML='<option value="all">全部地點</option>'+keys.map(function(r){return '<option value="'+esc(r)+'">'+esc(r)+'</option>';}).join("");
+  sel.value=ST.room;
+}
+function fitChips(){
+  document.querySelectorAll(".chips").forEach(function(el){
+    var row=el.parentNode;
+    el.classList.remove("wrap");row.classList.remove("stack");
+    var need=el.scrollWidth,have=el.clientWidth,full=row.clientWidth;
+    if(need<=have+1)return;                       /* 一行放得下 */
+    if(need<=full+1){row.classList.add("stack");return;}  /* 標籤移到上方後可放一行 */
+    el.classList.add("wrap");                     /* 需要換行 */
+    var chip=el.querySelector(".chip");
+    if(chip){
+      var rows=Math.round((el.clientHeight+6)/(chip.offsetHeight+6));
+      if(rows>2)row.classList.add("stack");       /* 超過兩行就把標籤移到上方 */
+    }
+  });
+  /* 只要有一列需要把標籤移到上方，兩列一起移，版面才一致 */
+  if(document.querySelector(".row.stack"))document.querySelectorAll(".row").forEach(function(r){r.classList.add("stack");});
+}
+var fitTimer=null;
+window.addEventListener("resize",function(){clearTimeout(fitTimer);fitTimer=setTimeout(fitChips,120);});
+function syncUI(){
+  document.querySelectorAll("#days button").forEach(function(b){b.classList.toggle("on",+b.dataset.day===ST.day);});
+  document.querySelectorAll("#chips .chip").forEach(function(b){b.classList.toggle("on",b.dataset.t===ST.type);});
+  document.querySelectorAll("#groups .chip").forEach(function(b){b.classList.toggle("on",b.dataset.g===ST.group);});
+  buildRooms();
+}
+function banner(){
+  var n=taipeiNow(),el=document.getElementById("banner");
+  if(n.date<DATES[1]){el.innerHTML="課程將於 <b>10/13（二）08:00</b> 報到，地點：誠愛樓 10 樓。";el.hidden=false;}
+  else if(n.date>DATES[2]){el.textContent="課程已結束，感謝參與！";el.hidden=false;}
+  else{
+    var d=(n.date===DATES[1]?1:2);
+    var cur=DATA.filter(function(x){return x.d===d&&n.min>=x.sm&&n.min<x.em&&(ST.group==="all"||!x.g||x.g===ST.group);}).length;
+    el.innerHTML="現在有 <b>"+cur+"</b> 場進行中，點「跳到現在」查看。";el.hidden=false;
+  }
+}
+
+document.addEventListener("click",function(e){
+  var s=e.target.closest&&e.target.closest("[data-star]");
+  if(!s)return;
+  var id=s.getAttribute("data-star");
+  if(MINE[id])delete MINE[id];else MINE[id]=1;
+  saveMine();
+  if(ST.type==="mine")render();
+  else{s.classList.toggle("on",!!MINE[id]);s.textContent=MINE[id]?"★":"☆";}
+});
+document.getElementById("q").addEventListener("input",function(e){ST.q=e.target.value.trim();render();});
+document.getElementById("room").addEventListener("change",function(e){ST.room=e.target.value;render();});
+document.getElementById("goNow").addEventListener("click",function(){
+  var n=taipeiNow(),d=n.date===DATES[2]?2:1;
+  if(ST.day!==d){ST.day=d;ST.room="all";}
+  ST.type="all";ST.q="";document.getElementById("q").value="";
+  syncUI();render();
+  var t=document.querySelector(".card.live");
+  if(!t){
+    var cur=n.date===DATES[d]?n.min:0,best=null;
+    document.querySelectorAll(".slot").forEach(function(s){if(!best&&mm(s.textContent)>=cur)best=s;});
+    t=best;
+  }
+  if(t)t.scrollIntoView({behavior:"smooth",block:"center"});
+});
+
+setInterval(function(){if(ST.type!=="fac"){banner();render();}},60000);
+(function init(){
+  var n=taipeiNow();if(n.date===DATES[2])ST.day=2;
+  buildDays();buildGroups();buildChips();syncUI();banner();render();fitChips();
+})();
+</script>
+</body>
+</html>
