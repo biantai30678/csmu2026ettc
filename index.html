@@ -100,6 +100,13 @@ section.info li{margin:4px 0}
 .route .links a{font-size:13px;padding:5px 10px;border-radius:999px;text-decoration:none;font-weight:600;border:2px solid}
 .route .links a.g{color:#1a73e8;border-color:#a8c7fa;background:#eef4ff}
 .route .links a.a{color:#2b2d42;border-color:#c8c9d6;background:#f1f2f6}
+.line-box{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0 4px}
+.line-box a{display:flex;align-items:center;justify-content:center;gap:6px;padding:11px 10px;border-radius:12px;text-decoration:none;font-weight:700;font-size:14px;text-align:center}
+.line-box a.add{background:#fff;color:#06c755;border:2px solid #06c755}
+.line-box a.msg{background:#06c755;color:#fff;border:2px solid #06c755;box-shadow:0 4px 10px rgba(6,199,85,.25)}
+.line-note{font-size:12px;color:var(--sub);margin-top:6px}
+.rpt{display:inline-flex;align-items:center;gap:4px;margin-top:8px;padding:5px 12px;border-radius:999px;background:#06c755;color:#fff;font-size:13px;font-weight:700;text-decoration:none}
+.card.past .rpt{background:#ced4da}
 .route .links .na{font-size:13px;padding:5px 10px;border-radius:999px;font-weight:600;border:2px solid #ffc9c9;background:#fff5f5;color:#e03131}
 .fac{display:grid;grid-template-columns:1fr;gap:8px}
 .fac .f{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:14px;background:var(--card);border:2px solid var(--line);box-shadow:0 2px 8px rgba(255,146,43,.06)}
@@ -134,6 +141,16 @@ section.info li{margin:4px 0}
 <div id="hint" class="hint" hidden></div>
 <div id="banner" class="banner" hidden></div>
 <main id="list"></main>
+
+<section class="info">
+  <h2>💬 聯絡總醫師</h2>
+  <div>課程中有任何問題，可透過 LINE 官方帳號詢問急診總醫師。</div>
+  <div class="line-box">
+    <a class="add" href="https://line.me/R/ti/p/@191avogf" target="_blank" rel="noopener">＋ 加入 LINE 好友</a>
+    <a class="msg" id="askLine" href="#" target="_blank" rel="noopener">💬 傳訊息給總醫師</a>
+  </div>
+  <div class="line-note">LINE ID：@191avogf｜點選後會開啟 LINE 並帶入訊息範本，確認內容後按「傳送」即可。選擇「我的組別」後，技術站卡片會出現「LINE 回報已到教室」按鈕。</div>
+</section>
 
 <section class="info">
   <h2>🗺️ 交通指引</h2>
@@ -278,7 +295,15 @@ function matches(x){
   return true;
 }
 
+var LINE_ID="@191avogf";
+function lineMsg(text){return "https://line.me/R/oaMessage/"+encodeURIComponent(LINE_ID)+"/?"+encodeURIComponent(text);}
+function updateAsk(){
+  var g=ST.group!=="all"?ST.group+" 組":"";
+  var el=document.getElementById("askLine");
+  if(el)el.href=lineMsg("【ETTC 學員詢問】\n姓名：\n組別："+g+"\n問題：");
+}
 function render(){
+  updateAsk();
   var hintEl=document.getElementById("hint");
   if(ST.type==="fac"){
     document.getElementById("list").innerHTML='<div class="slot">講師介紹</div><div class="fac">'+FACULTY.map(function(f,i){
@@ -306,6 +331,7 @@ function render(){
       +'<h3>'+esc(x.n)+'</h3>'+((x.t==="reg"||x.t==="break")?'':'<div class="tag">'+TYPENAME[x.t]+'</div>')
       +(x.te?'<div class="teacher">講師：<b>'+esc(x.te)+'</b></div>':'')
       +(x.note?'<div class="note">'+esc(x.note)+'</div>':'')
+      +((x.g&&ST.group!=="all")?'<a class="rpt" target="_blank" rel="noopener" href="'+lineMsg('【ETTC 報到回報】'+x.g+' 組已到 '+x.r+'\n課程：'+x.n+'\n時間：'+x.s+'–'+x.e+'\n姓名：')+'">💬 LINE 回報已到教室</a>':'')
       +'</article>';
   });
   document.getElementById("list").innerHTML=html||'<div class="empty">沒有符合條件的課程</div>';
